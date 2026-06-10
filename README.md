@@ -8,7 +8,7 @@
 
 ```bash
 # 1. Clone and install
-git clone https://github.com/YOUR_USERNAME/redrob-ranker
+git clone https://github.com/Anubrata023/redrob-hackathon-final.git
 cd redrob-ranker
 pip install -r requirements.txt
 
