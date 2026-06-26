@@ -2,3 +2,5 @@
 # All CPU-only, no network during ranking
 
 python-dateutil==2.9.0
+streamlit
+pandas

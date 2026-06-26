@@ -109,6 +109,15 @@ PREF_LOCATIONS = {
 # HONEYPOT DETECTION
 # ─────────────────────────────────────────────────────────────────────────────
 
+def parse_date(d_str):
+    if not d_str:
+        return None
+    try:
+        return datetime.strptime(d_str, "%Y-%m-%d")
+    except ValueError:
+        return None
+
+
 def is_honeypot(c: dict) -> tuple[bool, str]:
     p = c['profile']
     sig = c['redrob_signals']
@@ -118,19 +127,40 @@ def is_honeypot(c: dict) -> tuple[bool, str]:
     total_career_months = sum(j['duration_months'] for j in career)
     stated_yoe = p['years_of_experience']
 
+    # 1. Career months << stated years of experience
     if stated_yoe > 2 and total_career_months < (stated_yoe * 12 * 0.1):
         return True, f"career_months({total_career_months}) << stated_YoE({stated_yoe}yr)"
 
+    # 2. Expert skills with 0 duration months
     for s in skills:
         if s['proficiency'] == 'expert' and s.get('duration_months', 0) == 0:
             return True, f"expert '{s['name']}' with 0 months used"
 
+    # 3. Negative YoE
     if stated_yoe < 0:
         return True, f"negative YoE: {stated_yoe}"
 
-    current_jobs = [j for j in career if j['is_current']]
+    # 4. Simultaneous current jobs
+    current_jobs = [j for j in career if j.get('is_current')]
     if len(current_jobs) > 1:
         return True, f"{len(current_jobs)} simultaneous current jobs"
+
+    # 5. Impossible job durations (stated duration exceeds physical date range)
+    for j in career:
+        start = parse_date(j.get('start_date'))
+        if j.get('is_current') or not j.get('end_date'):
+            end = TODAY
+        else:
+            end = parse_date(j.get('end_date'))
+        if start and end:
+            diff_months = (end.year - start.year) * 12 + (end.month - start.month)
+            if j.get('duration_months', 0) > diff_months + 2:
+                return True, f"impossible job duration at {j.get('company')}: stated={j.get('duration_months')}, max={diff_months}"
+
+    # 6. Too many expert skills (>= 8)
+    expert_skills = [s for s in skills if s.get('proficiency') == 'expert']
+    if len(expert_skills) >= 8:
+        return True, f"too many expert skills: {len(expert_skills)} expert skills"
 
     return False, ''
 
@@ -139,7 +169,7 @@ def is_honeypot(c: dict) -> tuple[bool, str]:
 # COMPONENT SCORERS
 # ─────────────────────────────────────────────────────────────────────────────
 
-def score_title(current_title: str) -> float:
+def score_title(current_title: str, config: dict = None) -> float:
     t = current_title.lower().strip()
     for core in CORE_ML_TITLES:
         if core in t:
@@ -153,7 +183,9 @@ def score_title(current_title: str) -> float:
     return 5.0
 
 
-def score_career(career_history: list) -> float:
+def score_career(career_history: list, config: dict = None) -> float:
+    if config is None:
+        config = {}
     score = 0.0
     prod_ml_months = 0
     all_companies = []
@@ -190,17 +222,21 @@ def score_career(career_history: list) -> float:
         any(co in comp for co in CONSULTING_COS) for comp in all_companies
     )
     if is_consulting_only and len(all_companies) >= 1:
-        return 0.0   # zero out career score
+        if config.get('consulting_penalty_enabled', True):
+            return 0.0   # zero out career score
 
     return min(max(0.0, score), 30.0)   # cap at 30
 
 
-def score_skills(skills: list, assessment_scores: dict) -> float:
+def score_skills(skills: list, assessment_scores: dict, config: dict = None) -> float:
+    if config is None:
+        config = {}
     score = 0.0
+    skill_map = config.get('custom_skill_map', CORE_SKILL_MAP)
     for sk in skills:
         sname = sk['name'].lower()
         base_val = 0
-        for kw, val in CORE_SKILL_MAP.items():
+        for kw, val in skill_map.items():
             if kw in sname:
                 base_val = max(base_val, val)
         if base_val == 0:
@@ -219,14 +255,15 @@ def score_skills(skills: list, assessment_scores: dict) -> float:
 
     for sk_name, sk_score in assessment_scores.items():
         if sk_score >= 75:
-            for kw in CORE_SKILL_MAP:
+            for kw in skill_map:
                 if kw in sk_name.lower():
                     score = min(score + 2.0, 20.0)
                     break
-    return min(score, 20.0)
+    skills_cap = config.get('skills_score_cap', 25.0)
+    return min(score, skills_cap)
 
 
-def score_experience(yoe: float) -> float:
+def score_experience(yoe: float, config: dict = None) -> float:
     if 6 <= yoe <= 8:
         return 10.0
     elif 5 <= yoe < 6 or 8 < yoe <= 10:
@@ -245,7 +282,9 @@ def score_experience(yoe: float) -> float:
         return 2.0
 
 
-def score_location(country: str, location: str, willing_to_relocate: bool) -> float:
+def score_location(country: str, location: str, willing_to_relocate: bool, config: dict = None) -> float:
+    if config is None:
+        config = {}
     if country == 'India':
         loc_lower = location.lower()
         if any(pref in loc_lower for pref in PREF_LOCATIONS):
@@ -254,51 +293,61 @@ def score_location(country: str, location: str, willing_to_relocate: bool) -> fl
     elif willing_to_relocate:
         return 2.0
     else:
+        if not config.get('location_penalty_enabled', True):
+            return 0.0
         return -5.0   # active penalty for non-India unwilling
 
 
-def compute_behavioral_multiplier(sig: dict) -> float:
+def compute_behavioral_multiplier(sig: dict, config: dict = None) -> float:
+    if config is None:
+        config = {}
     mult = 1.0
-    try:
-        last_active = datetime.strptime(sig['last_active_date'], '%Y-%m-%d')
-        days_since = (TODAY - last_active).days
-        if days_since > 180:
-            mult *= 0.3
-        elif days_since > 90:
-            mult *= 0.6
-        elif days_since > 30:
+    
+    if config.get('enable_activity_decay', True):
+        try:
+            last_active = datetime.strptime(sig['last_active_date'], '%Y-%m-%d')
+            days_since = (TODAY - last_active).days
+            if days_since > 180:
+                mult *= 0.3
+            elif days_since > 90:
+                mult *= 0.6
+            elif days_since > 30:
+                mult *= 0.85
+        except (ValueError, KeyError):
+            mult *= 0.7
+
+    if config.get('enable_notice_penalty', True):
+        notice = sig.get('notice_period_days', 90)
+        if notice <= 15:
+            mult *= 1.15
+        elif notice <= 30:
+            mult *= 1.00
+        elif notice <= 60:
+            mult *= 0.90
+        elif notice <= 90:
+            mult *= 0.75
+        else:
+            mult *= 0.40
+
+    if config.get('enable_response_rate_penalty', True):
+        rr = sig.get('recruiter_response_rate', 0.5)
+        if rr >= 0.7:
+            mult *= 1.05
+        elif rr >= 0.4:
+            mult *= 1.00
+        elif rr >= 0.2:
+            mult *= 0.90
+        else:
+            mult *= 0.70
+
+    if config.get('enable_open_to_work_bonus', True):
+        if sig.get('open_to_work_flag', False):
+            mult *= 1.05
+
+    if config.get('enable_interview_completion_penalty', True):
+        icr = sig.get('interview_completion_rate', 0.5)
+        if icr < 0.3:
             mult *= 0.85
-    except (ValueError, KeyError):
-        mult *= 0.7
-
-    notice = sig.get('notice_period_days', 90)
-    if notice <= 15:
-        mult *= 1.15
-    elif notice <= 30:
-        mult *= 1.00
-    elif notice <= 60:
-        mult *= 0.90
-    elif notice <= 90:
-        mult *= 0.75
-    else:
-        mult *= 0.40
-
-    rr = sig.get('recruiter_response_rate', 0.5)
-    if rr >= 0.7:
-        mult *= 1.05
-    elif rr >= 0.4:
-        mult *= 1.00
-    elif rr >= 0.2:
-        mult *= 0.90
-    else:
-        mult *= 0.70
-
-    if sig.get('open_to_work_flag', False):
-        mult *= 1.05
-
-    icr = sig.get('interview_completion_rate', 0.5)
-    if icr < 0.3:
-        mult *= 0.85
 
     return max(0.3, min(mult, 1.2))
 
@@ -318,18 +367,23 @@ def build_reasoning(c: dict, scores: dict, rank: int) -> str:
     company = p['current_company']
     industry = p['current_industry']
 
-    if scores['title'] == 30:
+    # Use raw scores for generating reasoning to ensure correct logic
+    r_title = scores.get('raw_title', scores.get('title', 0.0))
+    r_career = scores.get('raw_career', scores.get('career', 0.0))
+    r_skills = scores.get('raw_skills', scores.get('skills', 0.0))
+
+    if r_title >= 30:
         positives.append(f"{title} at {company}")
-    elif scores['title'] == 12:
+    elif r_title >= 12:
         positives.append(f"{title} ({yoe:.0f}yr exp)")
     else:
         concerns.append(f"non-ML title ({title})")
 
-    if scores['career'] >= 20:
+    if r_career >= 20:
         positives.append(f"strong production ML history in {industry}")
-    elif scores['career'] >= 10:
+    elif r_career >= 10:
         positives.append(f"some production ML experience")
-    elif scores['career'] > 0:
+    elif r_career > 0:
         concerns.append("limited production ML depth in career history")
 
     top_skills = []
@@ -399,7 +453,7 @@ def build_reasoning(c: dict, scores: dict, rank: int) -> str:
 # MAIN SCORING FUNCTION
 # ─────────────────────────────────────────────────────────────────────────────
 
-def score_candidate(c: dict) -> tuple[float, dict]:
+def score_candidate(c: dict, config: dict = None) -> tuple[float, dict]:
     hp, reason = is_honeypot(c)
     if hp:
         return -9999.0, {'honeypot': reason}
@@ -407,28 +461,42 @@ def score_candidate(c: dict) -> tuple[float, dict]:
     p = c['profile']
     sig = c['redrob_signals']
 
-    t_score = score_title(p['current_title'])
+    if config is None:
+        config = {}
+
+    w_title = config.get('weight_title', 1.0)
+    w_career = config.get('weight_career', 1.0)
+    w_skills = config.get('weight_skills', 1.0)
+    w_experience = config.get('weight_experience', 1.0)
+    w_location = config.get('weight_location', 1.0)
+
+    t_score = score_title(p['current_title'], config)
     if t_score < 0:
-        t_score = -50
+        t_score = -50.0
 
-    c_score = score_career(c['career_history'])
-    sk_score = score_skills(c.get('skills', []), sig.get('skill_assessment_scores', {}))
-    e_score = score_experience(p['years_of_experience'])
-    l_score = score_location(p['country'], p['location'], sig.get('willing_to_relocate', False))
-    b_mult = compute_behavioral_multiplier(sig)
+    c_score = score_career(c['career_history'], config)
+    sk_score = score_skills(c.get('skills', []), sig.get('skill_assessment_scores', {}), config)
+    e_score = score_experience(p['years_of_experience'], config)
+    l_score = score_location(p['country'], p['location'], sig.get('willing_to_relocate', False), config)
+    b_mult = compute_behavioral_multiplier(sig, config)
 
-    base = t_score + c_score + sk_score + e_score + l_score
+    base = (t_score * w_title) + (c_score * w_career) + (sk_score * w_skills) + (e_score * w_experience) + (l_score * w_location)
     total = max(0.0, base) * b_mult
 
     components = {
-        'title': t_score,
-        'career': c_score,
-        'skills': sk_score,
-        'experience': e_score,
-        'location': l_score,
+        'title': t_score * w_title,
+        'career': c_score * w_career,
+        'skills': sk_score * w_skills,
+        'experience': e_score * w_experience,
+        'location': l_score * w_location,
         'behavioral_mult': b_mult,
         'base': base,
         'total': total,
+        'raw_title': t_score,
+        'raw_career': c_score,
+        'raw_skills': sk_score,
+        'raw_experience': e_score,
+        'raw_location': l_score,
     }
     return total, components
 
