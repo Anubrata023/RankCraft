@@ -782,6 +782,81 @@ if active_pool:
                     skills_matched_html += f"<span class='badge {badge_style}'>{sname} ({sk['proficiency']} • {sdur}m • {endorse}👍)</span>"
                 skills_matched_html += "</div>"
                 
+                # Skill Gap Analysis computation
+                candidate_skills_dict = {sk["name"].lower(): sk for sk in c_data.get("skills", [])}
+                candidate_skills_set = set(candidate_skills_dict.keys())
+                target_skills_set = set(custom_skill_map.keys())
+
+                # Matched core skills
+                matched_skills = []
+                for sk_name in target_skills_set:
+                    matched_key = None
+                    for cand_sk in candidate_skills_set:
+                        if sk_name in cand_sk or cand_sk in sk_name:
+                            matched_key = cand_sk
+                            break
+                    if matched_key:
+                        sk_info = candidate_skills_dict[matched_key]
+                        matched_skills.append(f"{sk_info['name']} ({sk_info['proficiency']})")
+
+                # Missing core skills
+                missing_skills = []
+                for sk_name in target_skills_set:
+                    matched_any = False
+                    for cand_sk in candidate_skills_set:
+                        if sk_name in cand_sk or cand_sk in sk_name:
+                            matched_any = True
+                            break
+                    if not matched_any:
+                        missing_skills.append(sk_name.upper())
+
+                # Complementary skills (in profile but not in target list)
+                complementary_skills = []
+                for cand_sk in candidate_skills_set:
+                    matched_any = False
+                    for sk_name in target_skills_set:
+                        if sk_name in cand_sk or cand_sk in sk_name:
+                            matched_any = True
+                            break
+                    if not matched_any:
+                        sk_info = candidate_skills_dict[cand_sk]
+                        complementary_skills.append(f"{sk_info['name']} ({sk_info['proficiency']})")
+
+                matched_badges_html = "<div>"
+                if matched_skills:
+                    for sk in sorted(matched_skills):
+                        matched_badges_html += f"<span class='badge badge-green'>{sk}</span>"
+                else:
+                    matched_badges_html += "<span style='font-size:12px;color:#94A3B8;'>None matched</span>"
+                matched_badges_html += "</div>"
+
+                missing_badges_html = "<div>"
+                if missing_skills:
+                    for sk in sorted(missing_skills):
+                        missing_badges_html += f"<span class='badge badge-red'>{sk}</span>"
+                else:
+                    missing_badges_html += "<span style='font-size:12px;color:#94A3B8;'>None missing</span>"
+                missing_badges_html += "</div>"
+
+                comp_badges_html = "<div>"
+                if complementary_skills:
+                    for sk in sorted(complementary_skills)[:8]:
+                        comp_badges_html += f"<span class='badge badge-purple'>{sk}</span>"
+                else:
+                    comp_badges_html += "<span style='font-size:12px;color:#94A3B8;'>None</span>"
+                comp_badges_html += "</div>"
+
+                skill_gap_html = f"""
+                <div style="background-color:#1E293B; border-radius:6px; padding:12px; margin-top:8px; margin-bottom:15px; border:1px solid #334155;">
+                    <div style="font-size:11px; color:#10B981; font-weight:700; margin-bottom:4px;">🟢 MATCHED CORE SKILLS</div>
+                    {matched_badges_html}
+                    <div style="font-size:11px; color:#FCA5A5; font-weight:700; margin-top:10px; margin-bottom:4px;">🔴 MISSING REQUIRED SKILLS</div>
+                    {missing_badges_html}
+                    <div style="font-size:11px; color:#DDD6FE; font-weight:700; margin-top:10px; margin-bottom:4px;">🟣 EXTRA COMPLEMENTARY SKILLS</div>
+                    {comp_badges_html}
+                </div>
+                """
+
                 # Highlighted Career History Timeline
                 timeline_html = "<div class='timeline-container'>"
                 for j in c_data.get("career_history", []):
@@ -825,6 +900,9 @@ if active_pool:
                     <div style="font-size:13px; color:#E2E8F0; padding:10px; background-color:#1E293B; border-radius:6px; border-left:4px solid #10B981; margin-top:5px; margin-bottom:15px;">
                         {insp_row['reasoning']}
                     </div>
+                    
+                    <div class="section-title">⚖️ JD Match & Skill Gap Analysis</div>
+                    {skill_gap_html}
                     
                     <div class="section-title">Key Skills Match Profile</div>
                     {skills_matched_html}
@@ -1022,14 +1100,54 @@ if active_pool:
             custom_writer.writerow(["candidate_id", "rank", "score", "reasoning"])
             for idx, r in enumerate(selected_rows, start=1):
                 custom_writer.writerow([r["candidate_id"], idx, r["score"], r["reasoning"]])
-                
-            st.download_button(
-                label=f"⬇️ Download Custom Shortlist CSV ({len(selected_rows)} candidates)",
-                data=custom_csv_buf.getvalue(),
-                file_name="custom_shortlist.csv",
-                mime="text/csv",
-                key="download_custom_csv"
-            )
+            
+            # Executive Report Generation
+            report_text = f"""=============================================================================
+             EXECUTIVE SHORTLIST SUMMARY REPORT — REDROB WORKBENCH
+=============================================================================
+Generated on: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+Hiring Target Role Description: {jd_text[:150]}...
+Total Candidates Shortlisted: {len(selected_rows)}
+Average Evaluation Score: {avg_score:.2f}
+Average Candidate Experience: {avg_yoe:.1f} Years
+Total Unique Cities: {len(set(r['location'] for r in selected_rows))}
+
+-----------------------------------------------------------------------------
+SHORTLISTED CANDIDATES EVALUATION SUMMARY:
+-----------------------------------------------------------------------------
+"""
+            for idx, r in enumerate(selected_rows, start=1):
+                c_data = r["_candidate"]
+                sig = c_data["redrob_signals"]
+                report_text += f"""
+{idx}. CANDIDATE ID: {r["candidate_id"]} (Score: {r["score"]:.3f})
+   - Rank: #{idx} (Relative Shortlist Rank)
+   - Current Title: {r["title"]}
+   - Current Company: {r["company"]}
+   - Experience: {r["yoe"]:.1f} Years
+   - Location: {r["location"]}, {r["country"]}
+   - Notice Period: {sig.get("notice_period_days")} Days
+   - Evaluation Reasoning Summary:
+     "{r["reasoning"]}"
+   --------------------------------------------------------------------------"""
+
+            col_dl1, col_dl2 = st.columns(2)
+            with col_dl1:
+                st.download_button(
+                    label=f"⬇️ Download Custom Shortlist CSV ({len(selected_rows)} candidates)",
+                    data=custom_csv_buf.getvalue(),
+                    file_name="custom_shortlist.csv",
+                    mime="text/csv",
+                    key="download_custom_csv"
+                )
+            with col_dl2:
+                st.download_button(
+                    label=f"📝 Download Executive Report (.txt)",
+                    data=report_text,
+                    file_name="executive_summary_report.txt",
+                    mime="text/plain",
+                    key="download_custom_report"
+                )
             
             # Show list/table of selected candidates with deselect option
             st.markdown("##### Selected Candidates Checklist")

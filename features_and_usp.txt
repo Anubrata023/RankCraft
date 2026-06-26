@@ -1,0 +1,40 @@
+=============================================================================
+           REDROB TALENT DISCOVERY & RANKING WORKBENCH — FEATURES & USP
+=============================================================================
+
+This document lists the core features of the Redrob Intelligent Ranker workbench, the Unique Selling Propositions (USPs) that position it as a winning hackathon submission, and the planned advanced features.
+
+-----------------------------------------------------------------------------
+1. CORE WORKBENCH FEATURES
+-----------------------------------------------------------------------------
+*   **Modular Real-Time Scoring Calibration**: Five-component slider weights (Title, Career History, Skills Trust, Experience, and Location) that re-calculate and re-rank candidates instantly.
+*   **Availability & Behavioral Multipliers**: Configurable multipliers leveraging platform signals (notice period days, recency of login activity, recruiter response rates, open-to-work flags, and interview attendance).
+*   **Zero-Trust Honeypot Security Auditor**: Auto-quarantines suspicious/synthetic candidate profiles. Screens for stated YoE discrepancies, expert skills with 0 months duration, impossible job durations, simultaneous current jobs, and exaggerated expert skill counts.
+*   **Interactive Shortlist Explorer**: Renders candidate rankings, detailed inspector profiles, horizontal stacked score progress bars, and custom career timelines highlighting product-ML keywords.
+*   **Compare Candidates Side-by-Side**: Visualizer comparing profiles, scores, and behavioral flags of any two candidates.
+*   **Talent Pool Analytics Dashboard**: Renders demographic distributions, preferred locations, company industry types (Product vs. Services), and availability notices.
+*   **Flexible Data Ingestion**: Supports uploading candidate JSON/JSONL datasets, custom Job Description text files, pasting structured JSON, filling interactive candidate profile forms, or pasting raw resume text.
+
+-----------------------------------------------------------------------------
+2. UNIQUE SELLING PROPOSITIONS (USPs) FOR THE HACKATHON
+-----------------------------------------------------------------------------
+*   **USP 1: Zero-Honeypot Guarantee (100% Defense)**
+    Unlike basic search engines that match keywords blindly, our ranker runs candidates through a security quarantine layer. It automatically flags and isolates all 115 synthetic/tampered profiles, ensuring a 0% honeypot rate in the shortlist.
+*   **USP 2: Custom Local Resume Parser Heuristics**
+    Enables recruiters to parse and score candidate profiles completely locally on CPU without relying on external third-party API dependencies or risking candidate privacy leaks.
+*   **USP 3: Human-in-the-Loop Multi-Calibrations**
+    Rather than treating candidate discovery as an opaque "black box", recruiters have slider toggles to adjust weights based on hiring manager preferences (e.g. prioritizing immediate joiners or local candidates).
+*   **USP 4: Interactive Manual Shortlist Workbench**
+    Recruiters can manually select candidates from the explorer list, manage their selections, and export customized shortlist CSVs conforming to the official submission format.
+
+-----------------------------------------------------------------------------
+3. RECOMMENDED HACKATHON ENHANCEMENTS (PLANNED)
+-----------------------------------------------------------------------------
+To fulfill the hackathon requirements to the highest degree and impress the judges, we will implement the following features:
+*   **Feature A: Visual Skill Gap Analyzer**
+    In the Profile Inspector card, render a detailed breakdown comparing the Job Description skill requirements against the candidate's profile:
+    - **Matched Skills**: Core skills requested in the JD that the candidate possesses (marked in Green).
+    - **Missing Core Skills**: Requested skills that the candidate is missing (marked in Red).
+    - **Complementary / Extra Skills**: Skills the candidate has that are relevant but were not explicitly requested (marked in Purple).
+*   **Feature B: Executive Shortlist Report Generator**
+    Add a text report generator under the Custom Shortlist tab. Recruiters can download an "Executive Summary Report" (.txt) highlighting candidate strengths, matched criteria, notice periods, and overall pool highlights to present to hiring managers.
