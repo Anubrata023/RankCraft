@@ -156,6 +156,11 @@ if "inspect_id" not in st.session_state:
     st.session_state["inspect_id"] = None
 if "jd_text_content" not in st.session_state:
     st.session_state["jd_text_content"] = load_jd_text()
+if "jd_text_area_classic" not in st.session_state:
+    st.session_state["jd_text_area_classic"] = load_jd_text()
+if "selected_skills_key" not in st.session_state:
+    default_parsed = parse_jd_text_local(st.session_state["jd_text_area_classic"])
+    st.session_state["selected_skills_key"] = list(default_parsed.keys())
 
 # Inject Global CSS for the White and Orange design system with bulletproof contrast
 st.markdown(clean_html("""
@@ -531,27 +536,49 @@ else:
     preset_choice = st.sidebar.selectbox("Choose JD Profile Preset", preset_list, key="preset_select_classic")
     
     def handle_preset_update():
-        st.session_state["jd_text_content"] = JD_PRESETS[preset_choice]["text"]
+        preset_text = JD_PRESETS[st.session_state["preset_select_classic"]]["text"]
+        st.session_state["jd_text_area_classic"] = preset_text
+        st.session_state["jd_text_content"] = preset_text
+        new_parsed = parse_jd_text_local(preset_text)
+        st.session_state["selected_skills_key"] = list(new_parsed.keys())
         
     st.sidebar.button("Load Chosen Preset", on_click=handle_preset_update)
 
     jd_text = st.sidebar.text_area(
         "JD Requirements Text",
-        value=st.session_state["jd_text_content"],
         height=130,
         key="jd_text_area_classic"
     )
     st.session_state["jd_text_content"] = jd_text
 
     # Custom skill mapping based on active JD
-    custom_skill_map = parse_jd_text_local(jd_text)
+    parsed_jd_skills = parse_jd_text_local(jd_text)
 
     # Inferred Latent Needs
     inferred_skills = DynamicJDCalibrator.calibrate(jd_text)
-    if inferred_skills:
-        for skill, weight in inferred_skills.items():
-            if skill not in custom_skill_map:
-                custom_skill_map[skill] = weight
+    
+    # Options list for the multiselect
+    available_skills = list(CORE_SKILL_MAP.keys())
+    all_options = sorted(list(set(available_skills + st.session_state.get("selected_skills_key", []) + list(parsed_jd_skills.keys()) + list(inferred_skills.keys()))))
+    
+    st.sidebar.markdown("### 🎯 Skill Targets Select")
+    selected_skills = st.sidebar.multiselect(
+        "Select skills to evaluate against",
+        options=all_options,
+        key="selected_skills_key"
+    )
+    
+    # Custom weight sliders for selected skills
+    with st.sidebar.expander("⚖️ Customize Selected Skill Weights", expanded=True):
+        custom_skill_map = {}
+        for skill in selected_skills:
+            # Get default weight from preset mapping if available, else 8
+            default_w = CORE_SKILL_MAP.get(skill.lower(), 8)
+            slider_key = f"weight_skill_val_{skill}"
+            if slider_key not in st.session_state:
+                st.session_state[slider_key] = default_w
+            w = st.slider(f"Weight: {skill.title()}", 1, 10, key=slider_key)
+            custom_skill_map[skill] = w
 
     with st.sidebar.expander("🔑 Extracted JD Skill Targets"):
         st.markdown("Matched target skills and search weight values:")
