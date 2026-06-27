@@ -1015,43 +1015,64 @@ else:
                     top_skill = list(candidate_skills_dict.keys())[0].upper() if candidate_skills_dict else "APPLIED ML"
                     current_company = p["current_company"]
                     
+                    # Generate candidate's realistic corporate email address
+                    comp_clean = re.sub(r'[^a-zA-Z0-9]', '', current_company.lower())
+                    name_clean = re.sub(r'[^a-zA-Z0-9\s]', '', p["anonymized_name"].lower()).replace(' ', '.')
+                    if "startup" in comp_clean or not comp_clean:
+                        cand_email = f"{name_clean}@candidate.rankcraft.ai"
+                    else:
+                        cand_email = f"{name_clean}@{comp_clean}.com"
+                    
                     if outreach_type == "Direct Interview Invitation":
-                        email_subject = f"Interview Invitation: Senior AI Engineer position at RankCraft"
+                        email_subject = f"Interview Invitation: Senior AI Engineer position at RankCraft AI"
                         email_body = (
                             f"Dear {first_name},\n\n"
-                            f"My name is Jordan Dawson, and I am the Lead Talent Architect at RankCraft. "
-                            f"We are currently hiring for our core AI division and I was exceptionally impressed by your engineering background at {current_company}, particularly your hands-on expertise in {top_skill}.\n\n"
-                            f"Based on our consensus-based ranking, your profile stands in the top tier of our target talent pipeline. "
-                            f"We would love to invite you for an initial interview to discuss how you can help scale our systems. "
-                            f"Please let me know your availability for a 20-minute discussion this week.\n\n"
-                            f"Warm regards,\n\n"
+                            f"I hope this email finds you well.\n\n"
+                            f"My name is Jordan Dawson, and I lead the Technical Talent Acquisition team at RankCraft AI. "
+                            f"We are currently expanding our core Engineering division and are looking for a Senior AI / Machine Learning Engineer to join our team.\n\n"
+                            f"I recently reviewed your professional background and was exceptionally impressed by your engineering trajectory at {current_company}, particularly your experience with {top_skill}.\n\n"
+                            f"Based on your profile matching our requirements, we would like to invite you for a technical interview to discuss this opportunity. "
+                            f"To get started, please let me know your availability for a 30-minute introductory Zoom discussion this week.\n\n"
+                            f"I have attached our job details for your reference. Looking forward to hearing from you.\n\n"
+                            f"Best regards,\n\n"
                             f"Jordan Dawson\n"
-                            f"Lead Talent Architect, RankCraft AI"
+                            f"Lead Technical Recruiter\n"
+                            f"RankCraft AI"
                         )
                     elif outreach_type == "Detailed Job Pitch & Comp Request":
-                        email_subject = f"Career Opportunity: Founding AI/ML Team at RankCraft"
+                        email_subject = f"Interview Schedule Request: Senior AI/ML Engineer at RankCraft AI"
                         email_body = (
                             f"Dear {first_name},\n\n"
-                            f"I am reaching out to you directly from the hiring team at RankCraft AI. "
-                            f"We have open roles for senior machine learning professionals to lead the development of our offline analytics and multi-agent swarm platforms.\n\n"
-                            f"Given your background at {current_company} and your overall experience, I wanted to discuss compensation, relocations to Pune/Noida, and core job details directly. "
-                            f"If you are open to exploring new engineering opportunities, please reply with a convenient time or call number.\n\n"
-                            f"Best regards,\n\n"
+                            f"I hope you are doing well.\n\n"
+                            f"I am reaching out to you directly from the Engineering Leadership team at RankCraft AI. "
+                            f"We have reviewed your profile and believe your experience at {current_company} aligns perfectly with our technical goals. "
+                            f"We would love to schedule a preliminary interview with our engineering director.\n\n"
+                            f"This position is based hybrid in our Noida/Pune office and includes a competitive compensation package. "
+                            f"If you are open to discussing this, please reply to this email with your preferred contact number and a few times you are free to chat this week.\n\n"
+                            f"Warm regards,\n\n"
                             f"Jordan Dawson\n"
-                            f"Hiring Team, RankCraft AI"
+                            f"Engineering Hiring Manager\n"
+                            f"RankCraft AI"
                         )
                     else:
-                        email_subject = f"Quick Inquiry: ML Engineering roles at RankCraft"
+                        email_subject = f"Hiring Inquiry: Senior Engineering Interview at RankCraft AI"
                         email_body = (
                             f"Dear {first_name},\n\n"
-                            f"I hope you are doing well. I lead recruiting at RankCraft AI. "
-                            f"We are actively seeking ML talent with hands-on skill in {top_skill}.\n\n"
+                            f"I hope you are having a productive week.\n\n"
+                            f"I lead technical recruiting at RankCraft AI. "
+                            f"We are actively seeking ML talent with hands-on skill in {top_skill} for open interviews.\n\n"
                             f"I wanted to connect directly to see if you are open to senior roles in Noida/Pune or if you could recommend peers from {current_company} who might be interested in exploring this with us. "
-                            f"Thank you for your time.\n\n"
+                            f"Thank you for your time and consideration.\n\n"
                             f"Best regards,\n\n"
                             f"Jordan Dawson\n"
-                            f"RankCraft AI Recruitment"
+                            f"Talent Partner\n"
+                            f"RankCraft AI"
                         )
+                    
+                    import urllib.parse
+                    subject_encoded = urllib.parse.quote(email_subject)
+                    body_encoded = urllib.parse.quote(email_body)
+                    mailto_url = f"mailto:{cand_email}?subject={subject_encoded}&body={body_encoded}"
                     
                     outreach_box_html = f"""
                     <div style="background-color:#F8FAFC; border-radius:6px; padding:12px; margin-top:8px; border:1px solid #E2E8F0;">
@@ -1060,13 +1081,24 @@ else:
                     </div>
                     """
                     st.markdown(outreach_box_html, unsafe_allow_html=True)
+                    
+                    st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
+                    st.link_button(
+                        f"✉️ Send Interview Offer Email to {first_name}",
+                        mailto_url,
+                        use_container_width=True,
+                        type="primary"
+                    )
 
                     inspector_card_html = textwrap.dedent(f"""
                     <div class="profile-card">
                         <div class="card-title">🔍 Candidate Profile Inspector: {insp_row["candidate_id"]}</div>
                         
                         <div style="font-size: 20px; font-weight:700; color:#1E293B; margin-bottom: 2px;">{p["anonymized_name"]}</div>
-                        <div style="font-size:13px; font-weight:500; color:#FF6B4A; margin-bottom: 12px;">{p["headline"]}</div>
+                        <div style="font-size:13px; font-weight:500; color:#FF6B4A; margin-bottom: 2px;">{p["headline"]}</div>
+                        <div style="font-size:12px; color:#64748B; margin-bottom: 15px;">
+                            📧 <b>Direct Contact:</b> {cand_email} | 📍 {p['location']}, {p['country']}
+                        </div>
                         
                         <div style="font-size: 13px; line-height:1.5; color:#475569; margin-bottom: 15px; font-style:italic;">
                             "{p["summary"]}"
