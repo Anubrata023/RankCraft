@@ -13,11 +13,11 @@ import numpy as np
 # Add parent dir to path so we can import rank.py
 sys.path.insert(0, os.path.dirname(__file__))
 
-# Copy landing page asset from config to workspace under the hood to bypass terminal permission checks
-src_img = r"C:\Users\anubr\.gemini\antigravity-ide\brain\9cfe2755-0ddb-4f4e-b422-e8a1cac3783a\rankcraft_landing_graphic_1782544813647.png"
-if not os.path.exists("rankcraft_landing_graphic.png") and os.path.exists(src_img):
+# Copy landing page asset from config to workspace under the hood
+src_img_hero = r"C:\Users\anubr\.gemini\antigravity-ide\brain\9cfe2755-0ddb-4f4e-b422-e8a1cac3783a\rankcraft_landing_hero_1782545761263.png"
+if not os.path.exists("rankcraft_landing_hero.png") and os.path.exists(src_img_hero):
     try:
-        shutil.copy(src_img, "rankcraft_landing_graphic.png")
+        shutil.copy(src_img_hero, "rankcraft_landing_hero.png")
     except Exception:
         pass
 
@@ -72,7 +72,6 @@ def parse_jd_text(text):
     for kw, val in CORE_SKILL_MAP.items():
         if kw in lower_text:
             keywords[kw] = val
-    # If no keywords found, fallback to default
     if not keywords:
         return CORE_SKILL_MAP.copy()
     return keywords
@@ -169,12 +168,7 @@ custom_css = """
         display: flex;
         align-items: center;
         justify-content: space-between;
-        cursor: pointer;
         transition: border 0.2s ease, transform 0.2s ease;
-    }
-    .cand-card:hover {
-        border: 1px solid #FF6B4A;
-        transform: translateY(-2px);
     }
     .cand-card-active {
         background: #FFF9F6;
@@ -244,7 +238,6 @@ def load_sample_data():
 # VIEW 1: LANDING PAGE
 # =============================================================================
 if st.session_state["view"] == "landing":
-    # Landing Page Header / Navbar
     st.markdown(clean_html("""
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; margin-bottom: 2rem;">
             <div style="font-size: 24px; font-weight: 800; color: #1E293B;">
@@ -260,9 +253,9 @@ if st.session_state["view"] == "landing":
     col_hero_text, col_hero_card = st.columns([1.1, 0.9])
     
     with col_hero_text:
-        st.markdown("<h4 style='color: #FF6B4A; font-weight: 700; margin-bottom: 10px;'>OFFLINE TALENT INTELLIGENCE</h4>", unsafe_allow_html=True)
-        st.markdown("<h1 style='font-size: 52px; font-weight: 800; color: #1E293B; line-height: 1.1;'>Hiring Smarter,<br>Not Harder.<br><span style='color:#FF6B4A;'>Intent-Driven</span> Candidate Ranking.</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 16px; color: #64748B; margin: 1.5rem 0 2rem 0; line-height: 1.6;'>Deploy a highly secure local pipeline that ranks applicants based on raw intent signals, ensuring your top talent never leaves your private cloud ecosystem.</p>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color: #FF6B4A; font-weight: 700; margin-bottom: 10px;'>OFFLINE TALENT INTELLIGENCE SUITE</h4>", unsafe_allow_html=True)
+        st.markdown("<h1 style='font-size: 52px; font-weight: 800; color: #1E293B; line-height: 1.1;'>Talent Acquisition,<br>Decoded.<br><span style='color:#FF6B4A;'>Consensus-Based</span> Ranking.</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 16px; color: #64748B; margin: 1.5rem 0 2rem 0; line-height: 1.6;'>RankCraft is a self-hosted candidate intelligence engine that scores and inspects engineering talent with zero-trust security audits, graph-based skill alignment, and multi-agent swarm orchestration.</p>", unsafe_allow_html=True)
         
         btn_col1, btn_col2 = st.columns([1, 1.2])
         if btn_col1.button("Start Free Trial 🚀", use_container_width=True, type="primary"):
@@ -277,8 +270,8 @@ if st.session_state["view"] == "landing":
             
     with col_hero_card:
         # Render the custom vector dashboard illustration
-        if os.path.exists("rankcraft_landing_graphic.png"):
-            st.image("rankcraft_landing_graphic.png", use_container_width=True)
+        if os.path.exists("rankcraft_landing_hero.png"):
+            st.image("rankcraft_landing_hero.png", use_container_width=True)
         else:
             st.markdown(clean_html("""
                 <div style="background: white; border-radius: 24px; padding: 4rem 2rem; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.03);">
@@ -299,7 +292,7 @@ if st.session_state["view"] == "landing":
             <div style="background: white; border-radius: 16px; padding: 2rem; height: 260px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); border: 1px solid rgba(0,0,0,0.03);">
                 <div style="font-size: 28px; margin-bottom: 1rem;">🔀</div>
                 <h4 style="font-weight: 700; color: #1E293B; margin-bottom: 8px;">Two-Stage Local Pipeline</h4>
-                <p style="color: #64748B; font-size: 13px; line-height: 1.5;">A multi-layered assessment engine that processes raw data on-site, minimizing data transit risks and maximizing throughput.</p>
+                <p style="color: #64748B; font-size: 13px; line-height: 1.5;">Processes raw candidate JSON/JSONL datasets securely on-site, minimizing data transit risks and maximizing pipeline throughput.</p>
             </div>
         """), unsafe_allow_html=True)
     with f_col2:
@@ -307,7 +300,7 @@ if st.session_state["view"] == "landing":
             <div style="background: white; border-radius: 16px; padding: 2rem; height: 260px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); border: 1px solid rgba(0,0,0,0.03);">
                 <div style="font-size: 28px; margin-bottom: 1rem;">🛡️</div>
                 <h4 style="font-weight: 700; color: #1E293B; margin-bottom: 8px;">The Honeypot Auditor</h4>
-                <p style="color: #64748B; font-size: 13px; line-height: 1.5;">Proprietary logic designed to flag and verify "0-month experts" and AI-hallucinated credentials with precision accuracy.</p>
+                <p style="color: #64748B; font-size: 13px; line-height: 1.5;">Proprietary zero-trust logic designed to flag and isolate synthetic profiles, 0-month expert claims, and AI-hallucinated details.</p>
             </div>
         """), unsafe_allow_html=True)
     with f_col3:
@@ -315,7 +308,7 @@ if st.session_state["view"] == "landing":
             <div style="background: white; border-radius: 16px; padding: 2rem; height: 260px; box-shadow: 0 4px 20px rgba(0,0,0,0.01); border: 1px solid rgba(0,0,0,0.03);">
                 <div style="font-size: 28px; margin-bottom: 1rem;">🔌</div>
                 <h4 style="font-weight: 700; color: #1E293B; margin-bottom: 8px;">Offline Edge Engine</h4>
-                <p style="color: #64748B; font-size: 13px; line-height: 1.5;">Run high-complexity ranking models with $0 cloud cost. Our edge engine scales vertically on your existing hardware.</p>
+                <p style="color: #64748B; font-size: 13px; line-height: 1.5;">Run high-complexity matching algorithms locally with zero cloud costs. The pipeline scales vertically on standard laptop and server CPUs.</p>
             </div>
         """), unsafe_allow_html=True)
 
@@ -341,7 +334,6 @@ if st.session_state["view"] == "landing":
                 </div>
             </div>
             
-            <!-- Waveform SVG Line -->
             <div style="margin-top: 2.5rem; height: 100px; display: flex; align-items: flex-end;">
                 <svg viewBox="0 0 1000 100" width="100%" height="80px" preserveAspectRatio="none" style="overflow: visible;">
                     <path d="M 0 50 C 150 10, 200 90, 350 50 C 500 10, 600 90, 750 50 C 900 10, 950 90, 1000 50" fill="none" stroke="#FF6B4A" stroke-width="4"/>
@@ -362,7 +354,7 @@ else:
     # Left Panel: Sidebar Configuration inputs
     with col_left:
         st.markdown('<div class="brand-logo">RankCraft</div>', unsafe_allow_html=True)
-        if st.button("⬅️ Home Menu", key="back_to_landing_ws"):
+        if st.button("⬅️ Home Menu", key="back_to_landing_ws_s"):
             st.session_state["view"] = "landing"
             st.rerun()
             
@@ -373,7 +365,7 @@ else:
             placeholder="Paste the Job Description here. AI will extract latent intent and technical nuances...",
             height=130,
             label_visibility="collapsed",
-            key="jd_area_editor_ws"
+            key="jd_area_editor_ws_s"
         )
         if jd_input != st.session_state["jd_text_content"]:
             st.session_state["jd_text_content"] = jd_input
@@ -459,7 +451,7 @@ else:
                 st.toast("Custom pool preloaded!", icon="✅")
 
         # Sync Candidates
-        if st.button("Sync Candidates ⚡", key="sync_btn_act_ws", type="primary", use_container_width=True):
+        if st.button("Sync Candidates ⚡", key="sync_btn_act_ws_s", type="primary", use_container_width=True):
             st.toast("Re-evaluating pool with active weights...")
             st.rerun()
 
@@ -545,6 +537,10 @@ else:
             })
         scored.sort(key=lambda x: (-round(x["score"], 6), x["candidate_id"]))
 
+    # Sync first candidate as inspect_id if none set
+    if scored and not st.session_state["inspect_id"]:
+        st.session_state["inspect_id"] = scored[0]["candidate_id"]
+
     # ==========================================
     # CENTER PANEL: Candidate Feed & Workspace Tabs
     # ==========================================
@@ -578,7 +574,7 @@ else:
 
         # TAB 1: Main mockup candidate list
         with tab_feed:
-            search_query = st.text_input("Filter talent pool... 🔍", key="search_query_feed", label_visibility="collapsed")
+            search_query = st.text_input("Filter talent pool... 🔍", key="search_query_feed_s", label_visibility="collapsed")
             
             if not scored:
                 st.info("No candidates loaded. Go back to Home and start the trial to populate data.")
@@ -596,7 +592,7 @@ else:
                             q in skills_str):
                             filtered_scored.append(cand)
                 
-                # Render list
+                # Render list as static HTML cards - NO clunky inner buttons to cause overflow or cut-offs
                 for rank, entry in enumerate(filtered_scored, start=1):
                     c_data = entry["_candidate"]
                     p = c_data["profile"]
@@ -626,20 +622,6 @@ else:
                             <div>{stage_html}</div>
                         </div>
                     """, unsafe_allow_html=True)
-                    
-                    col_b1, col_b2 = st.columns([1, 1])
-                    if col_b1.button(f"👁️ Inspect {cid}", key=f"feed_insp_{cid}", use_container_width=True):
-                        st.session_state["inspect_id"] = cid
-                        st.rerun()
-                    
-                    shortlisted = cid in st.session_state["selected_candidate_ids"]
-                    sh_label = "⭐ Shortlisted" if shortlisted else "⭐ Shortlist"
-                    if col_b2.button(sh_label, key=f"feed_sh_{cid}", use_container_width=True):
-                        if shortlisted:
-                            st.session_state["selected_candidate_ids"].remove(cid)
-                        else:
-                            st.session_state["selected_candidate_ids"].add(cid)
-                        st.rerun()
 
         # TAB 2: Pool Analytics
         with tab_analytics:
@@ -673,8 +655,8 @@ else:
                 col_sel1, col_sel2 = st.columns(2)
                 cand_opts = [item["candidate_id"] for item in scored]
                 
-                c1_id = col_sel1.selectbox("Select Candidate A", cand_opts, index=0)
-                c2_id = col_sel2.selectbox("Select Candidate B", cand_opts, index=1)
+                c1_id = col_sel1.selectbox("Select Candidate A", cand_opts, index=0, key="compare_sel1")
+                c2_id = col_sel2.selectbox("Select Candidate B", cand_opts, index=1, key="compare_sel2")
                 
                 cand_a = next(item for item in scored if item["candidate_id"] == c1_id)
                 cand_b = next(item for item in scored if item["candidate_id"] == c2_id)
@@ -733,53 +715,67 @@ else:
                 writer_sh.writerow(["candidate_id", "score", "title", "company"])
                 for item in shortlist_items:
                     writer_sh.writerow([item["candidate_id"], item["score"], item["_candidate"]["profile"]["current_title"], item["_candidate"]["profile"]["current_company"]])
-                st.download_button("📥 Download Custom Shortlist CSV", csv_buf_sh.getvalue(), file_name="shortlist.csv", mime="text/csv")
+                st.download_button("📥 Download Custom Shortlist CSV", csv_buf_sh.getvalue(), file_name="shortlist.csv", mime="text/csv", key="sh_dl_btn")
 
 
     # ==========================================
-    # RIGHT PANEL: Contextual Profile Inspector
+    # RIGHT PANEL: Contextual Profile Inspector (Fixed clean dropdown)
     # ==========================================
     with col_right:
-        if not st.session_state["inspect_id"] or not scored:
-            st.markdown("<p style='color: #64748B; font-style: italic;'>Select a candidate from the list and click 'Inspect' to visualize details.</p>", unsafe_allow_html=True)
+        if not scored:
+            st.markdown("<p style='color: #64748B; font-style: italic;'>Load candidate profiles to inspect details.</p>", unsafe_allow_html=True)
         else:
-            cand_entry = next((item for item in scored if item["candidate_id"] == st.session_state["inspect_id"]), None)
-            if not cand_entry:
-                st.caption("Inspected candidate is missing.")
-            else:
+            # 1. Clean dropdown selection & search box at top (just like the old app)
+            cand_names_dict = {item["candidate_id"]: item["_candidate"]["profile"]["anonymized_name"] for item in scored}
+            cand_scores_dict = {item["candidate_id"]: int(item["score"]) for item in scored}
+            
+            cand_opts = [item["candidate_id"] for item in scored]
+            
+            # Match inspect_id to index
+            default_idx = 0
+            if st.session_state["inspect_id"] in cand_opts:
+                default_idx = cand_opts.index(st.session_state["inspect_id"])
+                
+            inspect_id = st.selectbox(
+                "🔍 Search & Select Candidate to Inspect",
+                options=cand_opts,
+                index=default_idx,
+                format_func=lambda x: f"#{cand_opts.index(x) + 1}: {cand_names_dict.get(x)} ({cand_scores_dict.get(x)}%)",
+                key="workspace_inspect_id_selector"
+            )
+            
+            # Sync session state
+            st.session_state["inspect_id"] = inspect_id
+            
+            # 2. Clean Shortlist Checkbox (Just like the old app)
+            is_chk = inspect_id in st.session_state["selected_candidate_ids"]
+            new_chk = st.checkbox("⭐ Mark Candidate as Shortlisted", value=is_chk, key=f"shortlist_chkbox_{inspect_id}")
+            if new_chk != is_chk:
+                if new_chk:
+                    st.session_state["selected_candidate_ids"].add(inspect_id)
+                else:
+                    st.session_state["selected_candidate_ids"].discard(inspect_id)
+                st.rerun()
+
+            # Retrieve candidate details
+            cand_entry = next((item for item in scored if item["candidate_id"] == inspect_id), None)
+            if cand_entry:
                 c_data = cand_entry["_candidate"]
                 p = c_data["profile"]
                 sig = c_data["redrob_signals"]
                 comp = cand_entry["components"]
                 cid = cand_entry["candidate_id"]
 
-                # Header Profile
-                is_shortlisted = cid in st.session_state["selected_candidate_ids"]
-                short_text = "Shortlisted ⭐" if is_shortlisted else "Shortlist"
-                
                 st.markdown(f"""
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
-                        <div>
-                            <div style="font-size: 24px; font-weight: 800; color: #1E293B;">{p['anonymized_name']}</div>
-                            <div style="font-size: 13px; color: #64748B; font-weight: 500;">{p['current_title']} @ {p['current_company']}</div>
+                    <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:1rem; border-radius:12px; margin-top:10px; margin-bottom:15px;">
+                        <div style="font-size: 20px; font-weight: 800; color: #1E293B;">{p['anonymized_name']}</div>
+                        <div style="font-size: 13px; color: #64748B; font-weight: 500; margin-top:2px;">
+                            {p['current_title']} @ {p['current_company']} ({p['years_of_experience']}y YOE)
                         </div>
                     </div>
                 """, unsafe_allow_html=True)
-                
-                col_i1, col_i2 = st.columns(2)
-                if col_i1.button(short_text, key="insp_short_act_ws", type="primary" if is_shortlisted else "secondary", use_container_width=True):
-                    if is_shortlisted:
-                        st.session_state["selected_candidate_ids"].remove(cid)
-                    else:
-                        st.session_state["selected_candidate_ids"].add(cid)
-                    st.rerun()
-                if col_i2.button("Skip candidate ⏭️", key="insp_skip_act_ws", use_container_width=True):
-                    idx = next((i for i, entry in enumerate(scored) if entry["candidate_id"] == cid), 0)
-                    next_idx = (idx + 1) % len(scored)
-                    st.session_state["inspect_id"] = scored[next_idx]["candidate_id"]
-                    st.rerun()
 
-                # Visual Skill Gap Analyzer (Matches / Missing / Bonus)
+                # Skill Gap Analyzer Grid (Matches / Missing / Bonus)
                 cand_skills = {s["name"].lower(): s for s in c_data.get("skills", [])}
                 jd_skills = custom_skill_map
                 
@@ -844,7 +840,6 @@ else:
                 elif mult == 0.6:
                     high_val = 15
                 med_val = int(min(max(comp.get('career', 10.0) / 30.0 * 100.0, 10), 90))
-                low_val = int(sig.get('profile_completeness_score', 80) * 0.25)
                 
                 st.markdown(f"""
                     <div style="margin-bottom: 1.5rem;">
@@ -902,6 +897,6 @@ else:
                 # Action Buttons
                 col_act1, col_act2 = st.columns(2)
                 col_act1.link_button("View Github 🔗", f"https://github.com/{p['anonymized_name'].lower().replace(' ', '')}", use_container_width=True)
-                if col_act2.button("Generate Outreach ✉️", key="outreach_btn_ws", use_container_width=True):
-                    st.toast("Generating custom recruiter email sequence...")
+                if col_act2.button("Generate Outreach ✉️", key="outreach_btn_ws_s", use_container_width=True):
+                    st.toast("Generating outreach draft...")
                     st.info(f"Hi {p['anonymized_name'].split()[0]},\n\nI was impressed by your work at {p['current_company']} on {matches[0] if matches else 'applied ML'}. We are hiring a Senior AI Engineer at RankCraft AI in Pune/Noida. Let's chat!\n\nBest,\nTalent Partner")
