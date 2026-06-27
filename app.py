@@ -199,10 +199,28 @@ if "selected_skills_key" not in st.session_state:
 # Inject Global CSS for the White and Orange design system with bulletproof contrast
 st.markdown(clean_html("""
 <style>
-    /* Clean white sidebar override */
+    /* Premium Black Sidebar Override */
     [data-testid="stSidebar"] {
-        background-color: #FFFFFF !important;
-        border-right: 1px solid #E2E8F0 !important;
+        background-color: #111827 !important;
+        border-right: 1px solid #1F2937 !important;
+    }
+    
+    /* Make all texts, labels, and headers inside the sidebar white/light-grey */
+    [data-testid="stSidebar"] p, 
+    [data-testid="stSidebar"] span, 
+    [data-testid="stSidebar"] label, 
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2, 
+    [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] h4, 
+    [data-testid="stSidebar"] h5, 
+    [data-testid="stSidebar"] h6 {
+        color: #F8FAFC !important;
+    }
+    
+    /* Keep multiselect pill tags legible with dark text */
+    div[data-baseweb="tag"] span {
+        color: #1E293B !important;
     }
     
     /* Inputs, Selectboxes, Textareas, and Dropdown Popups text legibility */
@@ -226,6 +244,16 @@ st.markdown(clean_html("""
     }
     
     /* Input and text area styling */
+    textarea, 
+    input, 
+    div[data-baseweb="textarea"], 
+    div[data-baseweb="textarea"] > div,
+    div[data-baseweb="base-input"],
+    div[data-baseweb="input"] {
+        background-color: #FFFFFF !important;
+        color: #1E293B !important;
+    }
+    
     div[data-baseweb="textarea"] textarea, div[data-baseweb="input"] input {
         background-color: #FFFFFF !important;
         color: #1E293B !important;
