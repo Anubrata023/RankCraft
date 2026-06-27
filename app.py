@@ -160,33 +160,30 @@ if "jd_text_content" not in st.session_state:
 # Inject Global CSS for the White and Orange design system with bulletproof contrast
 st.markdown(clean_html("""
 <style>
-    /* Force high-contrast light slate background & dark slate text colors */
-    .stApp {
-        background-color: #F8FAFC !important;
-    }
-    
-    /* Enforce dark slate color on all native HTML elements on main page */
-    .stApp p, .stApp span, .stApp label, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp div {
-        color: #1E293B !important;
-    }
-    
     /* Clean white sidebar override */
     [data-testid="stSidebar"] {
         background-color: #FFFFFF !important;
         border-right: 1px solid #E2E8F0 !important;
     }
     
-    /* Force dark color on all sidebar labels & texts */
-    section[data-testid="stSidebar"] p, 
-    section[data-testid="stSidebar"] span, 
-    section[data-testid="stSidebar"] label, 
-    section[data-testid="stSidebar"] h1, 
-    section[data-testid="stSidebar"] h2, 
-    section[data-testid="stSidebar"] h3, 
-    section[data-testid="stSidebar"] h4, 
-    section[data-testid="stSidebar"] h5, 
-    section[data-testid="stSidebar"] h6 {
-        color: #334155 !important;
+    /* Inputs, Selectboxes, Textareas, and Dropdown Popups text legibility */
+    textarea, input, select {
+        color: #1E293B !important;
+    }
+    
+    /* Selectbox selected choice styling */
+    div[data-baseweb="select"] > div {
+        background-color: #FFFFFF !important;
+        color: #1E293B !important;
+    }
+    
+    /* Dropdown options popover elements styling */
+    div[role="listbox"], [data-baseweb="popover"] {
+        background-color: #FFFFFF !important;
+    }
+    div[role="option"], [data-baseweb="popover"] div, [data-baseweb="popover"] li, [data-baseweb="popover"] span {
+        color: #1E293B !important;
+        background-color: #FFFFFF !important;
     }
     
     /* Input and text area styling */
@@ -212,10 +209,6 @@ st.markdown(clean_html("""
         padding: 26px;
         margin-top: 10px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05) !important;
-    }
-    
-    .profile-card div, .profile-card span, .profile-card p, .profile-card h1, .profile-card h2, .profile-card h3 {
-        color: #1E293B !important;
     }
     
     .card-title {
