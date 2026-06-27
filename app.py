@@ -14,10 +14,15 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(__file__))
 
 # Copy landing page asset from config to workspace under the hood
-src_img_hero = r"C:\Users\anubr\.gemini\antigravity-ide\brain\9cfe2755-0ddb-4f4e-b422-e8a1cac3783a\rankcraft_ui_dashboard_1782546895775.png"
+src_img_hero = r"C:\Users\anubr\.gemini\antigravity-ide\brain\9cfe2755-0ddb-4f4e-b422-e8a1cac3783a\rankcraft_ui_light_1782547190724.png"
 if not os.path.exists("rankcraft_landing_hero.png") and os.path.exists(src_img_hero):
     try:
         shutil.copy(src_img_hero, "rankcraft_landing_hero.png")
+    except Exception:
+        pass
+if not os.path.exists("src/rankcraft_landing_hero.png") and os.path.exists(src_img_hero):
+    try:
+        shutil.copy(src_img_hero, "src/rankcraft_landing_hero.png")
     except Exception:
         pass
 
@@ -157,55 +162,63 @@ if "inspect_id" not in st.session_state:
 if "jd_text_content" not in st.session_state:
     st.session_state["jd_text_content"] = load_jd_text()
 
-# Inject Global CSS dark theme overrides
+# Inject Global CSS for the White and Orange design system
 st.markdown(clean_html("""
 <style>
-    /* Force high-contrast dark space background & override theme settings */
+    /* Global light slate & orange theme styles */
     .stApp {
-        background-color: #0B0F19 !important;
-        color: #E5E7EB !important;
+        background-color: #F8FAFC !important;
+        color: #1E293B !important;
         font-family: 'Inter', sans-serif;
     }
     
-    /* Make sidebar match midnight theme */
+    /* Clean white sidebar */
     [data-testid="stSidebar"] {
-        background-color: #0E131F !important;
-        border-right: 1px solid #1F2937 !important;
+        background-color: #FFFFFF !important;
+        border-right: 1px solid #E2E8F0 !important;
     }
     
-    /* Subheading styles */
+    /* Input and text area default contrast values */
+    div[data-baseweb="textarea"] textarea, div[data-baseweb="input"] input {
+        background-color: #FFFFFF !important;
+        color: #1E293B !important;
+        border: 1px solid #CBD5E1 !important;
+    }
+    
+    /* Heading style colors */
     h1, h2, h3, h4, h5, h6 {
-        color: #F9FAFB !important;
+        color: #1E293B !important;
         font-family: 'Outfit', sans-serif;
     }
     
     .metric-card {
-        background-color: #111827;
-        border: 1px solid #1F2937;
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 12px;
         padding: 20px;
         margin: 5px 0 15px 0;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
     
     .profile-card {
-        background-color: #0E1320;
-        border: 1px solid #1F2937;
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 16px;
         padding: 26px;
         margin-top: 10px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     }
     
     .card-title {
-        color: #F9FAFB;
+        color: #1E293B;
         font-size: 18px;
         font-weight: 700;
         margin-bottom: 12px;
-        border-bottom: 1px solid #1F2937;
+        border-bottom: 1px solid #E2E8F0;
         padding-bottom: 8px;
     }
     
+    /* Custom light theme badges */
     .badge {
         display: inline-block;
         padding: 4px 10px;
@@ -216,15 +229,15 @@ st.markdown(clean_html("""
         margin-bottom: 6px;
         text-transform: capitalize;
     }
-    .badge-green { background-color: #064E3B; color: #10B981; border: 1px solid #047857; }
-    .badge-blue { background-color: #1E3A8A; color: #3B82F6; border: 1px solid #1D4ED8; }
-    .badge-orange { background-color: #78350F; color: #F59E0B; border: 1px solid #D97706; }
-    .badge-red { background-color: #7F1D1D; color: #EF4444; border: 1px solid #B91C1C; }
-    .badge-grey { background-color: #374151; color: #9CA3AF; border: 1px solid #4B5563; }
-    .badge-purple { background-color: #4C1D95; color: #A78BFA; border: 1px solid #6D28D9; }
+    .badge-green { background-color: #E6F4EA; color: #137333; border: 1px solid #CEEAD6; }
+    .badge-blue { background-color: #E8F0FE; color: #1A73E8; border: 1px solid #D2E3FC; }
+    .badge-orange { background-color: #FDF2E9; color: #D56B1A; border: 1px solid #FADBD8; }
+    .badge-red { background-color: #FCE8E6; color: #C5221F; border: 1px solid #FAD2CF; }
+    .badge-grey { background-color: #F1F3F4; color: #5F6368; border: 1px solid #E8EAED; }
+    .badge-purple { background-color: #F3E8FF; color: #6B21A8; border: 1px solid #E9D5FF; }
     
     .timeline-container {
-        border-left: 2px solid #1F2937;
+        border-left: 2px solid #E2E8F0;
         padding-left: 20px;
         margin-left: 10px;
         margin-top: 15px;
@@ -241,8 +254,8 @@ st.markdown(clean_html("""
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        background-color: #3B82F6;
-        border: 2px solid #0B0F19;
+        background-color: #FF6B4A;
+        border: 2px solid #FFFFFF;
     }
     .timeline-item.current::before {
         background-color: #10B981;
@@ -251,34 +264,45 @@ st.markdown(clean_html("""
     .timeline-title {
         font-weight: 700;
         font-size: 14px;
-        color: #F9FAFB;
+        color: #1E293B;
     }
     .timeline-meta {
         font-size: 11px;
-        color: #9CA3AF;
+        color: #64748B;
         margin-bottom: 6px;
     }
     .timeline-desc {
         font-size: 12px;
-        color: #D1D5DB;
+        color: #475569;
         line-height: 1.5;
     }
     
     .section-title {
         font-size: 14px;
         font-weight: bold;
-        color: #9CA3AF;
+        color: #64748B;
         text-transform: uppercase;
         margin-top: 15px;
         margin-bottom: 5px;
         letter-spacing: 0.05em;
     }
     .highlight-keyword {
-        background-color: rgba(59, 130, 246, 0.2);
-        color: #93C5FD;
+        background-color: rgba(255, 107, 74, 0.15);
+        color: #D56B1A;
         border-radius: 3px;
         padding: 0px 4px;
         font-weight: 500;
+    }
+    
+    /* Style tab underlines with Orange Accent */
+    .stTabs [data-baseweb="tab"] {
+        color: #64748B !important;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .stTabs [aria-selected="true"] {
+        color: #FF6B4A !important;
+        border-bottom-color: #FF6B4A !important;
     }
 </style>
 """), unsafe_allow_html=True)
@@ -320,6 +344,8 @@ def parse_jd_text_local(jd_text):
 def load_sample_data():
     try:
         sample_path = "data/sample.jsonl"
+        if not os.path.exists(sample_path) and os.path.exists("src/data/sample.jsonl"):
+            sample_path = "src/data/sample.jsonl"
         candidates = []
         with open(sample_path, "r", encoding="utf-8") as f:
             for line in f:
@@ -332,15 +358,15 @@ def load_sample_data():
         st.error(f"Failed to load sample dataset: {e}")
 
 # =============================================================================
-# VIEW 1: LANDING PAGE (Futuristic, readable dark theme text and split buttons)
+# VIEW 1: LANDING PAGE (Clean White & Orange theme)
 # =============================================================================
 if st.session_state["view"] == "landing":
     st.markdown(clean_html("""
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; margin-bottom: 2rem;">
-            <div style="font-size: 26px; font-weight: 800; color: #F9FAFB; letter-spacing: 0.5px;">
+            <div style="font-size: 26px; font-weight: 800; color: #1E293B; letter-spacing: 0.5px;">
                 RankCraft <span style="color: #FF6B4A;">AI</span>
             </div>
-            <div style="background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;">
+            <div style="background: rgba(255, 107, 74, 0.08); color: #FF6B4A; border: 1px solid rgba(255, 107, 74, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;">
                 🟢 Offline AI Swarm Engine: Operational
             </div>
         </div>
@@ -351,8 +377,8 @@ if st.session_state["view"] == "landing":
     
     with col_hero_text:
         st.markdown("<h4 style='color: #FF6B4A; font-weight: 700; margin-bottom: 12px; letter-spacing: 1px;'>OFFLINE TALENT INTELLIGENCE SUITE</h4>", unsafe_allow_html=True)
-        st.markdown("<h1 style='font-size: 54px; font-weight: 800; color: #F9FAFB; line-height: 1.15; margin-bottom: 1rem;'>Talent Acquisition,<br>Decoded.<br><span style='color:#FF6B4A;'>Consensus-Based</span> Ranking.</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 16.5px; color: #9CA3AF; margin: 1.5rem 0 2rem 0; line-height: 1.6;'>RankCraft is a self-hosted candidate intelligence engine that scores and inspects engineering talent with zero-trust security audits, graph-based skill alignment, and multi-agent swarm orchestration.</p>", unsafe_allow_html=True)
+        st.markdown("<h1 style='font-size: 54px; font-weight: 800; color: #1E293B; line-height: 1.15; margin-bottom: 1rem;'>Talent Acquisition,<br>Decoded.<br><span style='color:#FF6B4A;'>Consensus-Based</span> Ranking.</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 16.5px; color: #475569; margin: 1.5rem 0 2rem 0; line-height: 1.6;'>RankCraft is a self-hosted candidate intelligence engine that scores and inspects engineering talent with zero-trust security audits, graph-based skill alignment, and multi-agent swarm orchestration.</p>", unsafe_allow_html=True)
         
         # Action buttons with unique sensible behaviors
         btn_col1, btn_col2 = st.columns([1, 1.2])
@@ -368,49 +394,51 @@ if st.session_state["view"] == "landing":
             st.session_state["sandbox_mode"] = True
             st.rerun()
             
-        if "sandbox_mode" in st.session_state and st.session_state["sandbox_mode"]:
-            st.success("Welcome to the Swarm Agent Sandbox! All weights and modifiers are automatically set to target senior roles.")
-            
     with col_hero_card:
-        if os.path.exists("rankcraft_landing_hero.png"):
-            st.image("rankcraft_landing_hero.png", use_container_width=True)
+        # Render the custom vector dashboard illustration
+        img_path = "rankcraft_landing_hero.png"
+        if os.path.exists("src/rankcraft_landing_hero.png"):
+            img_path = "src/rankcraft_landing_hero.png"
+            
+        if os.path.exists(img_path):
+            st.image(img_path, use_container_width=True)
         else:
             st.markdown(clean_html("""
-                <div style="background: #111827; border-radius: 24px; padding: 4rem 2rem; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); border: 1px solid #1F2937;">
+                <div style="background: #FFFFFF; border-radius: 24px; padding: 4rem 2rem; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
                     <div style="font-size: 64px; margin-bottom: 1rem;">📊</div>
-                    <div style="font-weight: 700; font-size: 18px; color: #F9FAFB; margin-bottom: 5px;">Offline Candidate Analytics</div>
-                    <div style="font-size: 13px; color: #9CA3AF;">Semantic clustering, Honeypots tracking and scoring</div>
+                    <div style="font-weight: 700; font-size: 18px; color: #1E293B; margin-bottom: 5px;">Offline Candidate Analytics</div>
+                    <div style="font-size: 13px; color: #64748B;">Semantic clustering, Honeypots tracking and scoring</div>
                 </div>
             """), unsafe_allow_html=True)
 
-    st.markdown("<br><hr style='border: 0; border-top: 1px solid #1F2937;'><br>", unsafe_allow_html=True)
+    st.markdown("<br><hr style='border: 0; border-top: 1px solid #E2E8F0;'><br>", unsafe_allow_html=True)
     st.markdown("<h4 style='text-align: center; color: #FF6B4A; font-weight: 700;'>ARCHITECTURE</h4>", unsafe_allow_html=True)
-    st.markdown("<h2 style='text-align: center; font-weight: 800; color: #F9FAFB; margin-bottom: 3rem;'>Architected for Extreme Efficiency</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; font-weight: 800; color: #1E293B; margin-bottom: 3rem;'>Architected for Extreme Efficiency</h2>", unsafe_allow_html=True)
 
     # Feature Grid
     f_col1, f_col2, f_col3 = st.columns(3)
     with f_col1:
         st.markdown(clean_html("""
-            <div style="background: #111827; border-radius: 16px; padding: 2rem; height: 260px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid #1F2937;">
-                <div style="font-size: 28px; margin-bottom: 1rem;">🔀</div>
-                <h4 style="font-weight: 700; color: #F9FAFB; margin-bottom: 8px;">Two-Stage Local Pipeline</h4>
-                <p style="color: #9CA3AF; font-size: 13px; line-height: 1.5;">Processes raw candidate JSON/JSONL datasets securely on-site, minimizing data transit risks and maximizing pipeline throughput.</p>
+            <div style="background: #FFFFFF; border-radius: 16px; padding: 2rem; height: 260px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
+                <div style="font-size: 28px; margin-bottom: 1rem; color: #FF6B4A;">🔀</div>
+                <h4 style="font-weight: 700; color: #1E293B; margin-bottom: 8px;">Two-Stage Local Pipeline</h4>
+                <p style="color: #64748B; font-size: 13px; line-height: 1.5;">Processes raw candidate JSON/JSONL datasets securely on-site, minimizing data transit risks and maximizing pipeline throughput.</p>
             </div>
         """), unsafe_allow_html=True)
     with f_col2:
         st.markdown(clean_html("""
-            <div style="background: #111827; border-radius: 16px; padding: 2rem; height: 260px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid #1F2937;">
-                <div style="font-size: 28px; margin-bottom: 1rem;">🛡️</div>
-                <h4 style="font-weight: 700; color: #F9FAFB; margin-bottom: 8px;">The Honeypot Auditor</h4>
-                <p style="color: #9CA3AF; font-size: 13px; line-height: 1.5;">Proprietary zero-trust logic designed to flag and isolate synthetic profiles, 0-month expert claims, and AI-hallucinated details.</p>
+            <div style="background: #FFFFFF; border-radius: 16px; padding: 2rem; height: 260px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
+                <div style="font-size: 28px; margin-bottom: 1rem; color: #FF6B4A;">🛡️</div>
+                <h4 style="font-weight: 700; color: #1E293B; margin-bottom: 8px;">The Honeypot Auditor</h4>
+                <p style="color: #64748B; font-size: 13px; line-height: 1.5;">Proprietary zero-trust logic designed to flag and isolate synthetic profiles, 0-month expert claims, and AI-hallucinated details.</p>
             </div>
         """), unsafe_allow_html=True)
     with f_col3:
         st.markdown(clean_html("""
-            <div style="background: #111827; border-radius: 16px; padding: 2rem; height: 260px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid #1F2937;">
-                <div style="font-size: 28px; margin-bottom: 1rem;">🔌</div>
-                <h4 style="font-weight: 700; color: #F9FAFB; margin-bottom: 8px;">Offline Edge Engine</h4>
-                <p style="color: #9CA3AF; font-size: 13px; line-height: 1.5;">Run high-complexity matching algorithms locally with zero cloud costs. The pipeline scales vertically on standard laptop and server CPUs.</p>
+            <div style="background: #FFFFFF; border-radius: 16px; padding: 2rem; height: 260px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
+                <div style="font-size: 28px; margin-bottom: 1rem; color: #FF6B4A;">🔌</div>
+                <h4 style="font-weight: 700; color: #1E293B; margin-bottom: 8px;">Offline Edge Engine</h4>
+                <p style="color: #64748B; font-size: 13px; line-height: 1.5;">Run high-complexity matching algorithms locally with zero cloud costs. The pipeline scales vertically on standard laptop and server CPUs.</p>
             </div>
         """), unsafe_allow_html=True)
 
@@ -418,20 +446,20 @@ if st.session_state["view"] == "landing":
 
     # Waveform Section
     st.markdown(clean_html("""
-        <div style="background: #111827; border-radius: 20px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid #1F2937;">
+        <div style="background: #FFFFFF; border-radius: 20px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div>
                     <span style="font-size: 11px; font-weight: 700; color: #FF6B4A; letter-spacing: 1px;">LIVE ANALYTICS</span>
-                    <h3 style="font-weight: 800; color: #F9FAFB; margin-top: 5px; margin-bottom: 0;">System Performance Waveform</h3>
+                    <h3 style="font-weight: 800; color: #1E293B; margin-top: 5px; margin-bottom: 0;">System Performance Waveform</h3>
                 </div>
                 <div style="display: flex; gap: 3rem;">
                     <div>
-                        <span style="font-size: 12px; color: #9CA3AF;">ACCURACY RATE</span>
+                        <span style="font-size: 12px; color: #64748B;">ACCURACY RATE</span>
                         <div style="font-size: 24px; font-weight: 800; color: #FF6B4A; margin-top: 2px;">98% / 98.4% Match</div>
                     </div>
                     <div>
-                        <span style="font-size: 12px; color: #9CA3AF;">PROCESSING SPEED</span>
-                        <div style="font-size: 24px; font-weight: 800; color: #F9FAFB; margin-top: 2px;">14ms Latency</div>
+                        <span style="font-size: 12px; color: #64748B;">PROCESSING SPEED</span>
+                        <div style="font-size: 24px; font-weight: 800; color: #1E293B; margin-top: 2px;">14ms Latency</div>
                     </div>
                 </div>
             </div>
@@ -591,13 +619,13 @@ else:
 
     # ── MAIN WORKSPACE PANEL ─────────────────────────────────────────────────
     st.markdown("""
-        <div style='display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1F2937; padding-bottom:10px; margin-bottom:20px;'>
+        <div style='display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #E2E8F0; padding-bottom:10px; margin-bottom:20px;'>
             <div>
-                <h1 style='margin:0; font-size:28px;'>🧠 RankCraft Candidate Discovery Workbench</h1>
-                <p style='margin:2px 0 0 0; color:#9CA3AF; font-size:13px;'>Consensus-Based Multi-Agent Swarm Recruiter Interface</p>
+                <h1 style='margin:0; font-size:28px; color: #1E293B;'>🧠 RankCraft Candidate Discovery Workbench</h1>
+                <p style='margin:2px 0 0 0; color:#64748B; font-size:13px;'>Consensus-Based Multi-Agent Swarm Recruiter Interface</p>
             </div>
             <div style='text-align:right;'>
-                <span style='background:rgba(255,107,74,0.1); border:1px solid #FF6B4A; color:#FF6B4A; padding:6px 14px; border-radius:30px; font-size:12px; font-weight:600;'>Swarm Status: Active</span>
+                <span style='background:rgba(255,107,74,0.08); border:1px solid #FF6B4A; color:#FF6B4A; padding:6px 14px; border-radius:30px; font-size:12px; font-weight:600;'>Swarm Status: Active</span>
             </div>
         </div>
     """, unsafe_allow_html=True)
@@ -697,19 +725,19 @@ else:
             col1, col2, col3 = st.columns(3)
             col1.markdown(clean_html(f"""
             <div class="metric-card">
-                <h5 style="color:#9CA3AF;margin:0 0 5px 0;font-size:12px;">TOTAL POOL LOADED</h5>
-                <h2 style="color:#F9FAFB;margin:0;font-size:32px;font-weight:700;">{len(active_pool)}</h2>
+                <h5 style="color:#64748B;margin:0 0 5px 0;font-size:12px;">TOTAL POOL LOADED</h5>
+                <h2 style="color:#1E293B;margin:0;font-size:32px;font-weight:700;">{len(active_pool)}</h2>
             </div>
             """), unsafe_allow_html=True)
             col2.markdown(clean_html(f"""
             <div class="metric-card">
-                <h5 style="color:#9CA3AF;margin:0 0 5px 0;font-size:12px;">SHORTLISTED & SCORED</h5>
+                <h5 style="color:#64748B;margin:0 0 5px 0;font-size:12px;">SHORTLISTED & SCORED</h5>
                 <h2 style="color:#10B981;margin:0;font-size:32px;font-weight:700;">{len(scored)}</h2>
             </div>
             """), unsafe_allow_html=True)
             col3.markdown(clean_html(f"""
             <div class="metric-card">
-                <h5 style="color:#9CA3AF;margin:0 0 5px 0;font-size:12px;">HONEYPOTS FILTERED</h5>
+                <h5 style="color:#64748B;margin:0 0 5px 0;font-size:12px;">HONEYPOTS FILTERED</h5>
                 <h2 style="color:#EF4444;margin:0;font-size:32px;font-weight:700;">{len(honeypots)}</h2>
             </div>
             """), unsafe_allow_html=True)
@@ -809,21 +837,21 @@ else:
                         ('Career History Quality', comp.get('career', 0.0), 30.0 * weight_career, '#10B981'),
                         ('Skills Trust Profile', comp.get('skills', 0.0), skills_score_cap * weight_skills, '#F59E0B'),
                         ('Experience Band Fit', comp.get('experience', 0.0), 10.0 * weight_experience, '#8B5CF6'),
-                        ('Location Alignment', comp.get('location', 0.0), 5.0 * weight_location, '#EC4899'),
-                        ('Semantic Text Similarity', comp.get('semantic_alignment', 0.0), 30.0 * weight_semantic, '#F43F5E'),
+                        ('Location Alignment', comp.get('location', 0.0), 5.0 * weight_location, '#FF6B4A'),
+                        ('Semantic Text Similarity', comp.get('semantic_alignment', 0.0), 30.0 * weight_semantic, '#FF8E53'),
                     ]
                     
-                    score_html = f"<div style='font-weight:700; font-size:15px; color:#F8FAFC; margin-bottom:12px;'>Composite Score: {comp.get('total', 0.0):.3f} <span style='font-weight:normal; font-size:12px; color:#94A3B8;'>(Base {comp.get('base', 0.0):.1f} × multiplier {comp.get('behavioral_mult', 1.0):.3f})</span></div>"
+                    score_html = f"<div style='font-weight:700; font-size:15px; color:#1E293B; margin-bottom:12px;'>Composite Score: {comp.get('total', 0.0):.3f} <span style='font-weight:normal; font-size:12px; color:#64748B;'>(Base {comp.get('base', 0.0):.1f} × multiplier {comp.get('behavioral_mult', 1.0):.3f})</span></div>"
                     score_html += "<div style='font-size:11px; color:#10B981; margin-bottom:10px;'>🤖 Swarm Agent Status: Optimized</div>"
                     for name, val, max_val, color in components_show:
                         pct = min(max(0.0, (val / max_val) * 100.0), 100.0) if max_val > 0 else 0.0
                         score_html += f"""
                         <div style='margin-bottom: 12px;'>
-                            <div style='display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px; color:#E2E8F0;'>
+                            <div style='display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px; color:#475569;'>
                                 <span>{name}</span>
                                 <span>{val:.1f} / {max_val:.1f}</span>
                             </div>
-                            <div style='width: 100%; background-color: #334155; border-radius: 4px; height: 6px;'>
+                            <div style='width: 100%; background-color: #E2E8F0; border-radius: 4px; height: 6px;'>
                                 <div style='width: {pct}%; background-color: {color}; height: 100%; border-radius: 4px;'></div>
                             </div>
                         </div>
@@ -928,7 +956,7 @@ else:
                         for sk in sorted(matched_skills):
                             matched_badges_html += f"<span class='badge badge-green'>{sk}</span>"
                     else:
-                        matched_badges_html += "<span style='font-size:12px;color:#94A3B8;'>None matched</span>"
+                        matched_badges_html += "<span style='font-size:12px;color:#64748B;'>None matched</span>"
                     matched_badges_html += "</div>"
                     
                     missing_badges_html = "<div>"
@@ -936,7 +964,7 @@ else:
                         for sk in sorted(missing_skills):
                             missing_badges_html += f"<span class='badge badge-red'>{sk}</span>"
                     else:
-                        missing_badges_html += "<span style='font-size:12px;color:#94A3B8;'>None missing</span>"
+                        missing_badges_html += "<span style='font-size:12px;color:#64748B;'>None missing</span>"
                     missing_badges_html += "</div>"
                     
                     comp_badges_html = "<div>"
@@ -944,16 +972,16 @@ else:
                         for sk in sorted(complementary_skills)[:8]:
                             comp_badges_html += f"<span class='badge badge-purple'>{sk}</span>"
                     else:
-                        comp_badges_html += "<span style='font-size:12px;color:#94A3B8;'>None</span>"
+                        comp_badges_html += "<span style='font-size:12px;color:#64748B;'>None</span>"
                     comp_badges_html += "</div>"
                     
                     skill_gap_html = f"""
-                    <div style="background-color:#1E293B; border-radius:6px; padding:12px; margin-top:8px; margin-bottom:15px; border:1px solid #334155;">
-                        <div style="font-size:11px; color:#10B981; font-weight:700; margin-bottom:4px;">🟢 MATCHED CORE SKILLS</div>
+                    <div style="background-color:#F8FAFC; border-radius:6px; padding:12px; margin-top:8px; margin-bottom:15px; border:1px solid #E2E8F0;">
+                        <div style="font-size:11px; color:#137333; font-weight:700; margin-bottom:4px;">🟢 MATCHED CORE SKILLS</div>
                         {matched_badges_html}
-                        <div style="font-size:11px; color:#FCA5A5; font-weight:700; margin-top:10px; margin-bottom:4px;">🔴 MISSING REQUIRED SKILLS</div>
+                        <div style="font-size:11px; color:#C5221F; font-weight:700; margin-top:10px; margin-bottom:4px;">🔴 MISSING REQUIRED SKILLS</div>
                         {missing_badges_html}
-                        <div style="font-size:11px; color:#DDD6FE; font-weight:700; margin-top:10px; margin-bottom:4px;">Extra Complementary Skills</div>
+                        <div style="font-size:11px; color:#6B21A8; font-weight:700; margin-top:10px; margin-bottom:4px;">Extra Complementary Skills</div>
                         {comp_badges_html}
                     </div>
                     """
@@ -972,9 +1000,9 @@ else:
                             
                         timeline_html += f"""
                         <div class='{class_item}'>
-                            <div class='timeline-title'>{j.get('title')} at {j.get('company')}</div>
-                            <div class='timeline-meta'>{j.get('start_date')} to {end_str} ({j.get('duration_months')} months) • Industry: {j.get('industry')}</div>
-                            <div class='timeline-desc'>{jd_desc}</div>
+                            <div class='timeline-title' style='color:#1E293B;'>{j.get('title')} at {j.get('company')}</div>
+                            <div class='timeline-meta' style='color:#64748B;'>{j.get('start_date')} to {end_str} ({j.get('duration_months')} months) • Industry: {j.get('industry')}</div>
+                            <div class='timeline-desc' style='color:#475569;'>{jd_desc}</div>
                         </div>
                         """
                     timeline_html += "</div>"
@@ -998,8 +1026,8 @@ else:
                         draft_text = f"Hi {first_name} - came across your background at {p['current_company']} and noticed your solid skill profile. We are hiring a Founding AI/ML Engineer. Let's connect!"
                     
                     outreach_box_html = f"""
-                    <div style="background-color:#1E293B; border-radius:6px; padding:12px; margin-top:8px; border:1px solid #334155;">
-                        <pre style="color:#F9FAFB; font-size:12px; font-family:'Courier New', monospace; white-space:pre-wrap; margin:0;">{draft_text}</pre>
+                    <div style="background-color:#F8FAFC; border-radius:6px; padding:12px; margin-top:8px; border:1px solid #E2E8F0;">
+                        <pre style="color:#1E293B; font-size:12px; font-family:'Courier New', monospace; white-space:pre-wrap; margin:0;">{draft_text}</pre>
                     </div>
                     """
                     st.markdown(outreach_box_html, unsafe_allow_html=True)
@@ -1008,10 +1036,10 @@ else:
                     <div class="profile-card">
                         <div class="card-title">🔍 Candidate Profile Inspector: {insp_row["candidate_id"]}</div>
                         
-                        <div style="font-size: 20px; font-weight:700; color:#F1F5F9; margin-bottom: 2px;">{p["anonymized_name"]}</div>
-                        <div style="font-size:13px; font-weight:500; color:#3B82F6; margin-bottom: 12px;">{p["headline"]}</div>
+                        <div style="font-size: 20px; font-weight:700; color:#1E293B; margin-bottom: 2px;">{p["anonymized_name"]}</div>
+                        <div style="font-size:13px; font-weight:500; color:#FF6B4A; margin-bottom: 12px;">{p["headline"]}</div>
                         
-                        <div style="font-size: 13px; line-height:1.5; color:#CBD5E1; margin-bottom: 15px; font-style:italic;">
+                        <div style="font-size: 13px; line-height:1.5; color:#475569; margin-bottom: 15px; font-style:italic;">
                             "{p["summary"]}"
                         </div>
                         
@@ -1022,7 +1050,7 @@ else:
                         {badges_html}
                         
                         <div class="section-title">Recruiter Reasoning</div>
-                        <div style="font-size:13px; color:#E2E8F0; padding:10px; background-color:#1E293B; border-radius:6px; border-left:4px solid #10B981; margin-top:5px; margin-bottom:15px;">
+                        <div style="font-size:13px; color:#1E293B; padding:10px; background-color:#F8FAFC; border-radius:6px; border-left:4px solid #FF6B4A; margin-top:5px; margin-bottom:15px;">
                             {insp_row['reasoning']}
                         </div>
                         
@@ -1102,12 +1130,12 @@ else:
                         pct = min(max(0.0, (val / max_val) * 100.0), 100.0) if max_val > 0 else 0.0
                         score_bars_html += f"""
                         <div style='margin-bottom: 8px;'>
-                            <div style='display: flex; justify-content: space-between; font-size: 11px; color:#CBD5E1;'>
+                            <div style='display: flex; justify-content: space-between; font-size: 11px; color:#475569;'>
                                 <span>{name}</span>
                                 <span>{val:.1f} / {max_val:.1f}</span>
                             </div>
-                            <div style='width: 100%; background-color: #334155; border-radius: 4px; height: 5px;'>
-                                <div style='width: {pct}%; background-color: #3B82F6; height: 100%; border-radius: 4px;'></div>
+                            <div style='width: 100%; background-color: #E2E8F0; border-radius: 4px; height: 5px;'>
+                                <div style='width: {pct}%; background-color: #FF6B4A; height: 100%; border-radius: 4px;'></div>
                             </div>
                         </div>
                         """
@@ -1117,27 +1145,27 @@ else:
                     
                     comparison_html = textwrap.dedent(f"""
                     <div class="profile-card">
-                        <div style="font-size:22px; font-weight:700; color:#3B82F6;">{r_data["candidate_id"]}</div>
-                        <div style="font-size:14px; font-weight:600; color:#F1F5F9;">Rank #{r_data["rank"]} (Score: {r_data["score"]:.3f})</div>
-                        <hr style="border-top: 1px solid #334155; margin: 10px 0;"/>
+                        <div style="font-size:22px; font-weight:700; color:#FF6B4A;">{r_data["candidate_id"]}</div>
+                        <div style="font-size:14px; font-weight:600; color:#1E293B;">Rank #{r_data["rank"]} (Score: {r_data["score"]:.3f})</div>
+                        <hr style="border-top: 1px solid #E2E8F0; margin: 10px 0;"/>
                         
                         <div class="section-title">Headline</div>
-                        <div style="font-size:13px; color:#E2E8F0; font-weight:500;">{p["headline"]}</div>
+                        <div style="font-size:13px; color:#1E293B; font-weight:500;">{p["headline"]}</div>
                         
                         <div class="section-title">Score Breakdown</div>
                         {score_bars_html}
                         
                         <div class="section-title">Behavioral Stats</div>
-                        <table style="width:100%; font-size:12px; color:#E2E8F0; border-collapse:collapse; margin-top:5px;">
-                            <tr><td style="padding:4px 0; color:#94A3B8;">Notice Period</td><td style="text-align:right; font-weight:600;">{sig.get("notice_period_days")} days</td></tr>
-                            <tr><td style="padding:4px 0; color:#94A3B8;">Response Rate</td><td style="text-align:right; font-weight:600;">{sig.get("recruiter_response_rate", 0.0):.0%}</td></tr>
-                            <tr><td style="padding:4px 0; color:#94A3B8;">GitHub Contribution</td><td style="text-align:right; font-weight:600;">{github_text}</td></tr>
-                            <tr><td style="padding:4px 0; color:#94A3B8;">Interview Attendance</td><td style="text-align:right; font-weight:600;">{sig.get("interview_completion_rate", 0.0):.0%}</td></tr>
-                            <tr><td style="padding:4px 0; color:#94A3B8;">Preferred work mode</td><td style="text-align:right; font-weight:600; text-transform:capitalize;">{sig.get("preferred_work_mode")}</td></tr>
+                        <table style="width:100%; font-size:12px; color:#1E293B; border-collapse:collapse; margin-top:5px;">
+                            <tr><td style="padding:4px 0; color:#64748B;">Notice Period</td><td style="text-align:right; font-weight:600;">{sig.get("notice_period_days")} days</td></tr>
+                            <tr><td style="padding:4px 0; color:#64748B;">Response Rate</td><td style="text-align:right; font-weight:600;">{sig.get("recruiter_response_rate", 0.0):.0%}</td></tr>
+                            <tr><td style="padding:4px 0; color:#64748B;">GitHub Contribution</td><td style="text-align:right; font-weight:600;">{github_text}</td></tr>
+                            <tr><td style="padding:4px 0; color:#64748B;">Interview Attendance</td><td style="text-align:right; font-weight:600;">{sig.get("interview_completion_rate", 0.0):.0%}</td></tr>
+                            <tr><td style="padding:4px 0; color:#64748B;">Preferred work mode</td><td style="text-align:right; font-weight:600; text-transform:capitalize;">{sig.get("preferred_work_mode")}</td></tr>
                         </table>
                         
                         <div class="section-title">Notice & Availability Reasoning</div>
-                        <div style="font-size:12px; color:#CBD5E1; line-height:1.4; padding:8px; background-color:#1E293B; border-radius:4px; margin-top:5px;">
+                        <div style="font-size:12px; color:#475569; line-height:1.4; padding:8px; background-color:#F8FAFC; border-radius:4px; margin-top:5px; border:1px solid #E2E8F0;">
                             {r_data["reasoning"]}
                         </div>
                     </div>
