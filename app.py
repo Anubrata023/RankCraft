@@ -228,6 +228,18 @@ st.markdown(clean_html("""
         color: #1E293B !important;
     }
     
+    /* Force dark text color and prevent light-color inheritance inside sidebar inputs */
+    [data-testid="stSidebar"] textarea, 
+    [data-testid="stSidebar"] input,
+    [data-testid="stSidebar"] div[data-baseweb="select"] div,
+    [data-testid="stSidebar"] div[data-baseweb="select"] span,
+    [data-testid="stSidebar"] div[data-baseweb="tag"] span,
+    [data-testid="stSidebar"] div[data-baseweb="textarea"] textarea,
+    [data-testid="stSidebar"] div[data-baseweb="input"] input {
+        color: #1E293B !important;
+        -webkit-text-fill-color: #1E293B !important;
+    }
+    
     /* Selectbox selected choice styling */
     div[data-baseweb="select"] > div {
         background-color: #FFFFFF !important;
