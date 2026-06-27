@@ -171,19 +171,19 @@ def is_honeypot(c: dict) -> tuple[bool, str]:
 
 def score_title(current_title: str, config: dict = None) -> float:
     t = current_title.lower().strip()
+    for disq in DISQUALIFIED_TITLES:
+        if disq in t:
+            return -20.0
     for core in CORE_ML_TITLES:
         if core in t:
             return 30.0
     for partial in PARTIAL_ML_TITLES:
         if partial in t:
             return 12.0
-    for disq in DISQUALIFIED_TITLES:
-        if disq in t:
-            return -20.0
     return 5.0
 
 
-def score_career(career_history: list, config: dict = None) -> float:
+def score_career(career_history: list, config: dict = None, current_company: str = None) -> float:
     if config is None:
         config = {}
     score = 0.0
@@ -224,6 +224,18 @@ def score_career(career_history: list, config: dict = None) -> float:
     if is_consulting_only and len(all_companies) >= 1:
         if config.get('consulting_penalty_enabled', True):
             return 0.0   # zero out career score
+
+    # Fallback to identify current company from career history if not passed directly
+    if not current_company:
+        current_jobs = [j for j in career_history if j.get('is_current')]
+        if current_jobs:
+            current_company = current_jobs[0].get('company')
+
+    # Apply penalty for current employer being in consulting
+    if current_company:
+        current_co = current_company.lower()
+        if any(co in current_co for co in CONSULTING_COS):
+            score -= 20.0
 
     return min(max(0.0, score), 30.0)   # cap at 30
 
@@ -474,7 +486,7 @@ def score_candidate(c: dict, config: dict = None) -> tuple[float, dict]:
     if t_score < 0:
         t_score = -50.0
 
-    c_score = score_career(c['career_history'], config)
+    c_score = score_career(c['career_history'], config, current_company=p.get('current_company'))
     sk_score = score_skills(c.get('skills', []), sig.get('skill_assessment_scores', {}), config)
     e_score = score_experience(p['years_of_experience'], config)
     l_score = score_location(p['country'], p['location'], sig.get('willing_to_relocate', False), config)
@@ -482,6 +494,7 @@ def score_candidate(c: dict, config: dict = None) -> tuple[float, dict]:
 
     base = (t_score * w_title) + (c_score * w_career) + (sk_score * w_skills) + (e_score * w_experience) + (l_score * w_location)
     total = max(0.0, base) * b_mult
+    total = min(total, 100.0)
 
     components = {
         'title': t_score * w_title,
