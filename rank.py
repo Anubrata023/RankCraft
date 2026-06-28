@@ -405,7 +405,7 @@ def score_location(country: str, location: str, willing_to_relocate: bool, confi
     else:
         if not config.get('location_penalty_enabled', True):
             return 0.0
-        return -5.0   # active penalty for non-India unwilling
+        return -10.0   # active penalty for non-India unwilling
 
 
 def compute_behavioral_multiplier(sig: dict, config: dict = None) -> float:

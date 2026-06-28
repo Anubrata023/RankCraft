@@ -43,7 +43,7 @@ The JD itself tells you the scoring signal that matters: **title and career hist
 | **Career history** | 30 | Production ML months at product companies; consulting-only → -15 |
 | **Skills (trusted)** | 25 | JD-relevant skills × proficiency × (endorsements + duration) trust weight |
 | **Experience years** | 10 | Peak at 6–8 yrs; hard penalty < 2 yrs or > 15 yrs |
-| **Location** | 5 | India: +3; preferred city (Pune/Noida/Hyd/Blr): +5; willing to relocate: +2 |
+| **Location** | 5 | India: +3; preferred city (Pune/Noida/Hyd/Blr): +5; willing to relocate: +2; non-India unwilling: -10 penalty |
 | **Behavioral ×** | ×0.3–1.2 | last_active_date, notice_period, recruiter_response_rate, open_to_work |
 
 **Final score = (T + C + Sk + E + L) × Behavioral_multiplier**

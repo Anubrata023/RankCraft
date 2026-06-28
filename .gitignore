@@ -1,7 +1,10 @@
-﻿data/candidates.jsonl
+data/candidates.jsonl
 data/candidates.jsonl.gz
 *.parquet
 __pycache__/
 venv/
 .idea/
 output/
+*.pptx
+*.pptx.gz
+
