@@ -7,4 +7,6 @@ venv/
 output/
 *.pptx
 *.pptx.gz
+*.pdf
+*.xlsx
 
