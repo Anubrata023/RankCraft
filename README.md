@@ -1,5 +1,5 @@
-# Redrob Hackathon —
-RankCraft-Intelligent Candidate Ranker
+# Redrob Hackathon 
+## RankCraft-Intelligent Candidate Ranker
 
 > Submission for the **Intelligent Candidate Discovery & Ranking Challenge**
 
