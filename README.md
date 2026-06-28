@@ -67,7 +67,7 @@ Each candidate gets a 1–2 sentence reasoning referencing specific facts: title
 
 ```
 rank.py                    — Main ranker (the reproduce command runs this)
-app.py                     — Streamlit sandbox (HuggingFace Spaces)
+app.py                     — Streamlit sandbox (Streamlit Community Cloud)
 requirements.txt           — Python dependencies
 submission_metadata.yaml   — Hackathon metadata
 validate_submission.py     — Format validator (from hackathon bundle)
@@ -88,7 +88,7 @@ README.md                  — This file
 
 ## Sandbox
 
-Live demo: [HuggingFace Spaces link here]
+Live demo: https://redrob-hackathon-final-9tdm7ijqlgmj6uds2bqlgq.streamlit.app/
 
 Upload a candidate JSON/JSONL sample (up to 500 candidates) and download the ranked CSV.
 

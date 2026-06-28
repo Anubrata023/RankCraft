@@ -15,9 +15,9 @@ team_members:
     email: "rachel.debnath@email.com"
     role: "Backend Engineer — pipeline, sandbox, validation, submission"
 
-github_repo: "https://github.com/Anubrata023/redrob-ranker-"
+github_repo: "https://github.com/Anubrata023/RankCraft"
 
-sandbox_link: "https://huggingface.co/spaces/YOUR_USERNAME/redrob-ranker"
+sandbox_link: "https://redrob-hackathon-final-9tdm7ijqlgmj6uds2bqlgq.streamlit.app/"
 
 reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
 
